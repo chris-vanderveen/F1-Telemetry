@@ -1,7 +1,4 @@
-mod listener;
-mod udp_socket_interface;
-
-use listener::Listener;
+use project::listener::Listener;
 
 fn main() {
     let port = 20777;
@@ -9,6 +6,7 @@ fn main() {
     match listener {
         Ok(mut l) => {
             println!("Listener Started on port {}", port);
+            l.listen_once().unwrap();
         }
         Err(e) => {
             eprintln!("Failed to start listener {}", e);

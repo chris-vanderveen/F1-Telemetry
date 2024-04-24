@@ -4,7 +4,7 @@ use std::io::Result;
 use std::net::SocketAddr;
 
 pub struct MockUdpSocket {
-    packet: Vec<u8>,
+    pub packet: Vec<u8>,
 }
 
 impl UdpSocketInterface for MockUdpSocket {
@@ -16,6 +16,6 @@ impl UdpSocketInterface for MockUdpSocket {
     fn recv_from(&self, buf: &mut [u8]) -> Result<(usize, SocketAddr)> {
         let len = self.packet.len().min(buf.len());
         buf[..len].copy_from_slice(&self.packet[..len]);
-        Ok((len, "127.0.0.1:20777".parse().unwrap()))
+        Ok((len, "10.0.0.120:20777".parse().unwrap()))
     }
 }

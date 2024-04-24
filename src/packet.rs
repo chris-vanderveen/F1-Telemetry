@@ -1,19 +1,20 @@
 use std::mem::size_of;
 
 #[repr(C, packed)]
+#[derive(Debug)]
 pub struct PacketHeader {
-    packet_format: u16,
-    game_year: u8,
-    game_major_version: u8,
-    game_minor_version: u8,
-    packet_version: u8,
-    packet_id: u8,
-    session_uid: u64,
-    session_time: f32,
-    frame_identifier: u32,
-    overall_frame_identifier: u32,
-    player_car_index: u8,
-    secondary_player_car_index: u8,
+    pub packet_format: u16,
+    pub game_year: u8,
+    pub game_major_version: u8,
+    pub game_minor_version: u8,
+    pub packet_version: u8,
+    pub packet_id: u8,
+    pub session_uid: u64,
+    pub session_time: f32,
+    pub frame_identifier: u32,
+    pub overall_frame_identifier: u32,
+    pub player_car_index: u8,
+    pub secondary_player_car_index: u8,
 }
 
 impl PacketHeader {
@@ -36,7 +37,12 @@ impl PacketHeader {
 
     pub fn as_bytes(&self) -> Vec<u8> {
         let size = size_of::<Self>();
-        let ptr = self as *const Self as *const u8;
-        unsafe { Vec::from_raw_parts(ptr as *mut u8, size, size) }
+        let mut buffer = vec![0u8; size];
+        let ptr = buffer.as_mut_ptr() as *mut Self;
+        unsafe {
+            // Copy data into the buffer
+            ptr.copy_from_nonoverlapping(self, 1);
+        }
+        buffer
     }
 }
