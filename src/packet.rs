@@ -17,24 +17,6 @@ pub struct PacketHeader {
     pub secondary_player_car_index: u8,
 }
 
-impl PacketHeader {
-    pub fn new() -> PacketHeader {
-        PacketHeader {
-            packet_format: 2023,
-            game_year: 23,
-            game_major_version: 1,
-            game_minor_version: 0,
-            packet_version: 1,
-            packet_id: 1,
-            session_uid: 1234567890123456789,
-            session_time: 1234.5,
-            frame_identifier: 1000,
-            overall_frame_identifier: 2000,
-            player_car_index: 1,
-            secondary_player_car_index: 255,
-        }
-    }
-
     pub fn as_bytes(&self) -> Vec<u8> {
         let size = size_of::<Self>();
         let mut buffer = vec![0u8; size];
@@ -45,4 +27,51 @@ impl PacketHeader {
         }
         buffer
     }
+}
+
+pub struct UnpackError(pub String);
+
+#[derive(Debug)]
+pub struct WheelData<T> {
+    pub rear_left: T,
+    pub rear_right: T,
+    pub front_left: T,
+    pub front_right: T,
+}
+
+#[derive(Debug)]
+pub enum SurfaceType {
+    Tarmac,
+    RumbleStrip,
+    Concrete,
+    Rock,
+    Gravel,
+    Mud,
+    Sand,
+    Grass,
+    Water,
+    Cobblestone,
+    Metal,
+    Ridged,
+}
+
+#[derive(Debug, Default)]
+pub enum TyreCompound {
+    C0,
+    C1,
+    C2,
+    C3,
+    C4,
+    C5,
+    Inter,
+    Wet,
+    ClassicDry,
+    ClassicWet,
+    F2SuperSoft,
+    F2Soft,
+    F2Medium,
+    F2Hard,
+    F2Wet,
+    #[default]
+    Invalid,
 }
