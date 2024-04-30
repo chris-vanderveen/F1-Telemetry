@@ -1,3 +1,7 @@
+use crate::packet::SurfaceType;
+use crate::packet::WheelData;
+use crate::packets::header::PacketHeader;
+
 // Frequency: 2/s
 // Size: 1107 bytes
 #[derive(Debug)]

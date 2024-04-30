@@ -1,3 +1,7 @@
+use crate::packets::header::PacketHeader;
+use crate::packets::participants::Nationality;
+use crate::packets::participants::Team;
+
 // Two every second while in lobby
 // 1218 bytes
 #[derive(Debug)]
@@ -6,7 +10,7 @@ pub struct LobbyInfoData {
     team_id: Team,
     nationality: Nationality,
     platform: u8,
-    name: vec<char>,
+    name: Vec<char>,
     car_number: u8,
     ready_status: u8,
 }

@@ -1,3 +1,5 @@
+use crate::packets::header::PacketHeader;
+
 // For the normalised vectors, to convert to float values
 // divide by 32767.0f - 16 bit signed values are used to pack the
 // data and on the assumption that direction values are always
@@ -26,9 +28,9 @@ pub struct CarMotionData {
     // World space right x direction (normalised)
     world_right_dir_x: i16,
     // World space right y direction (normalised)
-    world_right_dir_x: i16,
+    world_right_dir_y: i16,
     // World space right z direction (normalised)
-    world_right_dir_x: i16,
+    world_right_dir_z: i16,
     // G forces
     lateral_g_force: f32,
     longitudinal_g_force: f32,

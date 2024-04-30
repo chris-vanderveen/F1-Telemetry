@@ -1,3 +1,5 @@
+use crate::packets::header::PacketHeader;
+
 // The Event details packet is different for each type of event
 // Make sure the correct type is interpreted.
 #[derive(Debug)]
@@ -22,7 +24,7 @@ pub struct RaceWinner {
 }
 
 #[derive(Debug)]
-pub struct penalty {
+pub struct Penalty {
     penalty_type: u8,
     infringement_type: u8,
     vehicle_idx: u8,       // Index of the car pen is applied to
@@ -75,10 +77,30 @@ pub struct Overtake {
 }
 
 #[derive(Debug)]
+pub enum Event {
+    SessionStarted,
+    SessionEnded,
+    FastestLap(FastestLap),
+    Retirement(Retirement),
+    DRSEnabled,
+    DRSDisabled,
+    TeamMateInPits(TeamMateInPits),
+    ChequeredFlag,
+    RaceWinner(RaceWinner),
+    Penalty(Penalty),
+    SpeedTrap(SpeedTrap),
+    LightsOut,
+    DriveThroughPenaltyServed(DriveThroughPenaltyServed),
+    StopGoPenaltyServed(StopGoPenaltyServed),
+    Flashback(Flashback),
+    Overtake(Overtake),
+}
+
+#[derive(Debug)]
 pub struct PacketEventData {
     packet_header: PacketHeader,
-    event_string_code: EventStringCode,
-    event_details: EventDataDetails,
+    event_string_code: Vec<u8>,
+    event: Event,
 }
 
 // Not sure if I actually need this or not

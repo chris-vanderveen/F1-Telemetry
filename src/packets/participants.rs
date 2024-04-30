@@ -1,3 +1,5 @@
+use crate::packets::header::PacketHeader;
+
 #[derive(Debug)]
 pub struct ParticipantData {
     ai_controlled: u8,     // AI = 1, Human = 0

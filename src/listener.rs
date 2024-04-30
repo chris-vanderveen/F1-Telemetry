@@ -1,4 +1,4 @@
-use crate::packet::PacketHeader;
+use crate::packets::header::PacketHeader;
 use crate::udp_socket_interface::UdpSocketInterface;
 use byteorder::{ByteOrder, LittleEndian};
 use std::fs::OpenOptions;
@@ -31,7 +31,7 @@ impl<T: UdpSocketInterface> Listener<T> {
     }
 
     pub fn listen_once(&mut self) -> Result<()> {
-        let mut buf = [0; 1400];
+        let mut buf = [0; 2048];
         let mut file = OpenOptions::new()
             .create(true)
             .write(true)
@@ -39,7 +39,7 @@ impl<T: UdpSocketInterface> Listener<T> {
             .open("packet_headers.txt")?;
 
         let mut i = 0;
-        while i < 1000 {
+        while i < 10000 {
             match self.socket.recv_from(&mut buf) {
                 Ok((num_bytes, src_addr)) => {
                     println!("Received {} bytes from {}", num_bytes, src_addr);

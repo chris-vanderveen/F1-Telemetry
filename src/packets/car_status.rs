@@ -1,3 +1,5 @@
+use crate::packet::TyreCompound;
+use crate::packets::header::PacketHeader;
 // Frequency: Rate as specified in menu
 // Size: 1239 bytes
 #[derive(Debug)]

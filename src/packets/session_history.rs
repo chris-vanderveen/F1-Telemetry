@@ -1,3 +1,5 @@
+use crate::packets::header::PacketHeader;
+
 // Frequency: 20/s (cycles through all 20 cars once per second)
 // Size: 1460 bytes
 #[derive(Debug)]
@@ -29,6 +31,6 @@ pub struct PacketSessionHistoryData {
     best_sector1_lap_num: u8,
     best_sector2_lap_num: u8,
     best_sector3_lap_num: u8,
-    lap_history_data: vec<LapHistoryData>, // Vector of lap data structs, max of 100 laps
-    tyre_stint_history_data: vec<TyreStintHistoryData>, // Max vec size = 8
+    lap_history_data: Vec<LapHistoryData>, // Vector of lap data structs, max of 100 laps
+    tyre_stint_history_data: Vec<TyreStintHistoryData>, // Max vec size = 8
 }

@@ -1,10 +1,12 @@
+use crate::packets::header::PacketHeader;
+
 // Frequency: 10/s
 // Size: 953 bytes
 #[derive(Debug)]
 pub struct CarDamageData {
-    tyres_wear: vec<f32>, // Vec of four floats that represent tyre wear (Percentage)
-    tyres_damage: vec<u8>,
-    brakes_damage: vec<u8>,
+    tyres_wear: Vec<f32>, // Vec of four floats that represent tyre wear (Percentage)
+    tyres_damage: Vec<u8>,
+    brakes_damage: Vec<u8>,
     fl_wing_damage: u8, // (Percentage)
     fr_wing_damage: u8,
     rear_wing_damage: u8,

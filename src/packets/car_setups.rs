@@ -1,4 +1,7 @@
+use crate::packets::header::PacketHeader;
+
 // Frequency: 2/s
+
 // Size: 1107 bytes
 #[derive(Debug)]
 pub struct CarSetupData {
@@ -29,5 +32,5 @@ pub struct CarSetupData {
 #[derive(Debug)]
 pub struct PacketCarSetupData {
     header: PacketHeader,
-    car_setups: CarSetUpData,
+    car_setups: CarSetupData,
 }

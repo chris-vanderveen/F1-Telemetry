@@ -1,3 +1,5 @@
+use crate::packets::header::PacketHeader;
+
 #[derive(Debug)]
 pub struct LapData {
     last_lap_time_ms: u32,

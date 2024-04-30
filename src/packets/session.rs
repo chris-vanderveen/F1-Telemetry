@@ -1,3 +1,5 @@
+use crate::packets::header::PacketHeader;
+
 // Details about the current session in progress
 // Frequency 2 per second
 // Size: 644 bytes
