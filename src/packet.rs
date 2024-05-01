@@ -11,11 +11,11 @@ pub struct Packet<'a> {
 }
 
 impl<'a> Packet<'a> {
-    fn new(header: PacketHeader, data: &'a [u8]) -> Self {
+    pub fn new(header: PacketHeader, data: &'a [u8]) -> Self {
         Packet { header, data }
     }
 
-    fn process(&self) {
+    pub fn process(&self) {
         match self.header.packet_id {
             0 => self.process_motion_data(),
             // 1 => self.process_session_data(),

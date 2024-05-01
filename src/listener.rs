@@ -1,11 +1,7 @@
-use crate::packets::event::PacketEventData;
+use crate::constants::PACKET_HEADER_SIZE;
+use crate::packet::Packet;
 use crate::packets::header::PacketHeader;
-use crate::packets::lap_data::PacketLapData;
-use crate::packets::motion::PacketMotionData;
-use crate::packets::participants::PacketParticipantsData;
-use crate::packets::session::PacketSessionData;
 use crate::udp_socket_interface::UdpSocketInterface;
-use byteorder::{ByteOrder, LittleEndian};
 use std::fs::OpenOptions;
 use std::io::{Result, Write};
 
@@ -61,32 +57,13 @@ impl<T: UdpSocketInterface> Listener<T> {
     }
 
     fn process_packet(&self, packet: &[u8]) {
-        let packet_format = LittleEndian::read_u16(&packet[0..2]);
-        let game_year = packet[2];
-        let game_major_version = packet[3];
-        let game_minor_version = packet[4];
-        let packet_version = packet[5];
-        let packet_id = packet[6];
-        let session_uid = LittleEndian::read_u64(&packet[7..15]);
-        let session_time = LittleEndian::read_f32(&packet[15..19]);
-        let frame_identifier = LittleEndian::read_u32(&packet[19..23]);
-        let overall_frame_identifier = LittleEndian::read_u32(&packet[23..27]);
-        let player_car_index = packet[27];
-        let secondary_player_car_index = packet[28];
-
-        let packet_header = PacketHeader {
-            packet_format,
-            game_year,
-            game_major_version,
-            game_minor_version,
-            packet_version,
-            packet_id,
-            session_uid,
-            session_time,
-            frame_identifier,
-            overall_frame_identifier,
-            player_car_index,
-            secondary_player_car_index,
-        };
+        match PacketHeader::from_bytes(packet) {
+            Ok(header) => {
+                let packet_data = &packet[PACKET_HEADER_SIZE..];
+                let packet_instance = Packet::new(header, packet_data);
+                packet_instance.process();
+            }
+            Err(e) => eprintln!("Failed to parse packet header: {}", e),
+        }
     }
 }
