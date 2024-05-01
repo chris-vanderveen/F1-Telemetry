@@ -2,6 +2,10 @@ pub mod listener;
 pub mod packet;
 pub mod udp_socket_interface;
 
+pub mod constants {
+    pub const PACKET_HEADER_SIZE: usize = 29;
+}
+
 pub mod packets {
     pub mod car_damage_data;
     pub mod car_setups;

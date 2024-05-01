@@ -6,7 +6,7 @@ fn main() {
     match listener {
         Ok(mut l) => {
             println!("Listener Started on port {}", port);
-            l.listen_once().unwrap();
+            l.listen().unwrap();
         }
         Err(e) => {
             eprintln!("Failed to start listener {}", e);

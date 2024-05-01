@@ -1,6 +1,7 @@
 use crate::packets::header::PacketHeader;
+use serde::Serialize;
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct ParticipantData {
     ai_controlled: u8,     // AI = 1, Human = 0
     driver_id: u8,         // Driver Id - 255 if Human
@@ -16,14 +17,14 @@ pub struct ParticipantData {
 }
 
 // Every 5 Seconds 1306 bytes
-#[derive(Debug)]
-struct PacketParticipantsData {
+#[derive(Debug, Serialize)]
+pub struct PacketParticipantsData {
     header: PacketHeader,
     num_active_cars: u8, // Number of cars in the data
     participants: ParticipantData,
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Serialize)]
 pub enum Driver {
     CarlosSainz,
     DaniilKvyat,
@@ -163,7 +164,7 @@ pub enum Driver {
     Unknown,
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Serialize)]
 pub enum Team {
     Mercedes,
     Ferrari,
@@ -310,7 +311,7 @@ pub enum Team {
     Unknown,
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Serialize)]
 pub enum Nationality {
     American,
     Argentinean,

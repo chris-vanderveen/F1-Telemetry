@@ -1,9 +1,13 @@
+use crate::packets::event::PacketEventData;
 use crate::packets::header::PacketHeader;
+use crate::packets::lap_data::PacketLapData;
+use crate::packets::motion::PacketMotionData;
+use crate::packets::participants::PacketParticipantsData;
+use crate::packets::session::PacketSessionData;
 use crate::udp_socket_interface::UdpSocketInterface;
 use byteorder::{ByteOrder, LittleEndian};
 use std::fs::OpenOptions;
-use std::io::Result;
-use std::io::Write;
+use std::io::{Result, Write};
 
 pub struct Listener<T: UdpSocketInterface> {
     pub socket: T,
@@ -84,7 +88,5 @@ impl<T: UdpSocketInterface> Listener<T> {
             player_car_index,
             secondary_player_car_index,
         };
-
-        println!("Processing packet: {:?}", packet_header);
     }
 }

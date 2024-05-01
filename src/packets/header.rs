@@ -1,4 +1,7 @@
-#[derive(Debug)]
+use byteorder::{ByteOrder, LittleEndian};
+use serde::Serialize;
+
+#[derive(Debug, Serialize)]
 pub struct PacketHeader {
     // Packet format for game year (2023)
     pub packet_format: u16,
@@ -24,4 +27,23 @@ pub struct PacketHeader {
     pub player_car_index: u8,
     // Index of second players car in the array. 255 if no second player
     pub secondary_player_car_index: u8,
+}
+
+impl PacketHeader {
+    fn from_bytes(packet: &[u8]) -> Self {
+        PacketHeader {
+            packet_format: LittleEndian::read_u16(&packet[0..2]),
+            game_year: packet[2],
+            game_major_version: packet[3],
+            game_minor_version: packet[4],
+            packet_version: packet[5],
+            packet_id: packet[6],
+            session_uid: LittleEndian::read_u64(&packet[7..15]),
+            session_time: LittleEndian::read_f32(&packet[15..19]),
+            frame_identifier: LittleEndian::read_u32(&packet[19..23]),
+            overall_frame_identifier: LittleEndian::read_u32(&packet[23..27]),
+            player_car_index: packet[27],
+            secondary_player_car_index: packet[28],
+        }
+    }
 }
