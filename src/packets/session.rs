@@ -1,9 +1,11 @@
 use crate::packets::header::PacketHeader;
+use byteorder::{ByteOrder, LittleEndian};
+use serde::Serialize;
 
 // Details about the current session in progress
 // Frequency 2 per second
 // Size: 644 bytes
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct MarshalZone {
     // Fraction (0..1) of the way through the lap marshal zone starts
     zone_start: f32,
@@ -11,7 +13,7 @@ pub struct MarshalZone {
     zone_flag: i8,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct WeatherForecastSample {
     // 0 = unknown, 1 = P1, 2 = P2, 3 = P3, 4 = Short P, 5 = Q1
     // 6 = Q2, 7 = Q3, 8 = Short Q, 9 = OSQ, 10 = R, 11 = R2
@@ -33,9 +35,8 @@ pub struct WeatherForecastSample {
     rain_percentage: u8,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct PacketSessionData {
-    header: PacketHeader,
     weather: u8,
     track_temperature: i8,
     air_temperature: i8,
@@ -102,4 +103,58 @@ pub struct PacketSessionData {
     temp_units_secondary_player: u8,
     num_safety_car_periods: u8,
     num_red_flag_periods: u8,
+}
+
+impl PacketSessionData {
+    pub fn from_bytes(data: &[u8]) -> Self {
+        let num_marshal_zones = data[18] as usize;
+        let mut marshal_zones = Vec::new();
+        let mut offset = 19;
+    }
+}
+
+impl MarshalZone {
+    fn from_bytes(data: &[u8]) -> Result<MarshalZone, std::io::Error> {
+        if data.len() != 5 {
+            return Err(std::io::Error::new(
+                std::io::ErrorKind::InvalidInput,
+                "Invalid data",
+            ));
+        }
+        let bytes: [u8; 4] = data[0..4].try_into().map_err(|_| {
+            std::io::Error::new(
+                std::io::ErrorKind::InvalidInput,
+                "Failed to convert slice to array",
+            )
+        })?;
+        let zone_start = f32::from_le_bytes(bytes);
+        let zone_flag = data[4] as i8;
+
+        Ok(MarshalZone {
+            zone_start,
+            zone_flag,
+        })
+    }
+}
+
+impl WeatherForecastSample {
+    fn from_bytes(data: &[u8]) -> Result<WeatherForecastSample, std::io::Error> {
+        if data.len() != 8 {
+            return Err(std::io::Error::new(
+                std::io::ErrorKind::InvalidInput,
+                "Invalid Data",
+            ));
+        }
+
+        Ok(WeatherForecastSample {
+            session_type: data[0],
+            time_offset: data[1],
+            weather: data[2],
+            track_temperature: data[3] as i8,
+            track_temp_change: data[4] as i8,
+            air_temp: data[5] as i8,
+            air_temp_change: data[6] as i8,
+            rain_percentage: data[7],
+        })
+    }
 }

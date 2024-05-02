@@ -1,8 +1,9 @@
 use crate::packets::header::PacketHeader;
 use crate::packets::motion::CarMotionData;
+use crate::packets::session::PacketSessionData;
 use serde::Serialize;
 use std::fs::OpenOptions;
-use std::io::{self, Write};
+use std::io::{self, Seek, SeekFrom, Write};
 use std::path::Path;
 
 pub struct Packet<'a> {
@@ -18,7 +19,7 @@ impl<'a> Packet<'a> {
     pub fn process(&self) {
         match self.header.packet_id {
             0 => self.process_motion_data(),
-            // 1 => self.process_session_data(),
+            1 => self.process_session_data(),
             // 2 => self.process_lap_data(),
             // 3 => self.process_event_data(),
             // 4 => self.process_participants_data(),
@@ -38,13 +39,17 @@ impl<'a> Packet<'a> {
     fn process_motion_data(&self) {
         let car_motion_data = CarMotionData::from_bytes(self.data);
         let filename = format!(
-            "/Users/chrisvanderveen/Documents/School/DEV/f1_data/{}_motion.json",
+            "/Users/chrisvanderveen/Documents/School/DEV/f1_data/motion_data/{}_motion.json",
             self.header.session_uid
         );
         let path = Path::new(&filename);
         if let Err(e) = Packet::<'a>::save_to_file(&car_motion_data, &path) {
             eprintln!("Failed to save or update motion data: {}", e);
         }
+    }
+
+    fn process_session_data(&self) {
+        let session_data = PacketSessionData::from_bytes(self.data);
     }
 
     fn save_to_file<T: Serialize>(data: &T, path: &Path) -> io::Result<()> {
@@ -56,9 +61,10 @@ impl<'a> Packet<'a> {
             .open(path)?;
 
         if file_exists {
-            writeln!(file, ",{}", serde_json::to_string(data)?);
+            file.seek(SeekFrom::End(-1))?;
+            writeln!(file, ",{}", serde_json::to_string(data)?)?;
         } else {
-            writeln!(file, "[{}]", serde_json::to_string(data)?);
+            writeln!(file, "[{}]", serde_json::to_string(data)?)?;
         }
 
         Ok(())
