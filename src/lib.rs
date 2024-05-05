@@ -4,6 +4,7 @@ pub mod udp_socket_interface;
 
 pub mod constants {
     pub const PACKET_HEADER_SIZE: usize = 29;
+    pub const FILE_PATH: &str = "/Users/chrisvanderveen/Documents/School/DEV/f1_data/";
 }
 
 pub mod packets {
@@ -17,6 +18,7 @@ pub mod packets {
     pub mod lap_data;
     pub mod lobby_info;
     pub mod motion;
+    pub mod motion_ex;
     pub mod participants;
     pub mod session;
     pub mod session_history;

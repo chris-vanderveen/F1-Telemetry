@@ -8,9 +8,9 @@ pub struct PacketMotionExData {
     suspension_velocity: Vec<f32>, // <RL, RR, FL, FR> [4]
     suspension_acceleration: Vec<f32>,
     wheel_speed: Vec<f32>,
-    wheel_slip_angle: vec<f32>,
-    wheel_lat_force: vec<f32>,
-    wheel_long_force: vec<f32>,
+    wheel_slip_angle: Vec<f32>,
+    wheel_lat_force: Vec<f32>,
+    wheel_long_force: Vec<f32>,
     height_of_cog: f32, // Height of COG (Centre of Gravity) from the ground
     local_velocity_x: f32,
     local_velocity_y: f32,

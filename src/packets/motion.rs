@@ -1,12 +1,17 @@
-use crate::packets::header::PacketHeader;
+use crate::{packet::SerializeToJSON, packets::header::PacketHeader};
 use byteorder::{ByteOrder, LittleEndian};
 use serde::Serialize;
+use std::fs::OpenOptions;
+use std::io::{Seek, SeekFrom, Write};
+use std::path::Path;
 
 // For the normalised vectors, to convert to float values
 // divide by 32767.0f - 16 bit signed values are used to pack the
 // data and on the assumption that direction values are always
 // between -1.0f and 1.0f.
 // Size: 1349 bytes
+
+// 60 bytes each * 22 = 1320
 #[derive(Debug, Serialize)]
 pub struct CarMotionData {
     // World space x pos (m)
@@ -73,5 +78,48 @@ impl CarMotionData {
             pitch: LittleEndian::read_f32(&data[52..56]),
             roll: LittleEndian::read_f32(&data[56..60]),
         }
+    }
+}
+
+impl PacketMotionData {
+    pub fn from_bytes(data: &[u8]) -> Self {
+        let header = PacketHeader::from_bytes(&data[0..29]);
+        let mut car_motion_data = Vec::new();
+        let mut offset = 29;
+        for _ in 0..22 {
+            let motion_data = CarMotionData::from_bytes(&data[offset..offset + 60]);
+            car_motion_data.push(motion_data);
+            offset += 60;
+        }
+
+        PacketMotionData {
+            header: header,
+            car_motion_data: car_motion_data,
+        }
+    }
+}
+
+impl SerializeToJSON for PacketMotionData {
+    fn serialize_to_json(&self) -> std::io::Result<()> {
+        let path_name = format!(
+            "/Users/chrisvanderveen/Documents/School/DEV/f1_data/motion_data/{}_motion.json",
+            self.header.session_uid
+        );
+        let path = Path::new(&path_name);
+        let file_exists = path.exists();
+        let mut file = OpenOptions::new()
+            .write(true)
+            .create(!file_exists)
+            .append(file_exists)
+            .open(path)?;
+
+        if file_exists {
+            file.seek(SeekFrom::End(-1))?;
+            writeln!(file, ",{}", serde_json::to_string(self)?)?;
+        } else {
+            writeln!(file, "[{},", serde_json::to_string(self)?)?;
+        }
+
+        Ok(())
     }
 }

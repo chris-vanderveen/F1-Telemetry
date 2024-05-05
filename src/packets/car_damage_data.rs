@@ -28,7 +28,7 @@ pub struct CarDamageData {
 }
 
 #[derive(Debug)]
-pub struct PackageCarDamageData {
+pub struct PacketCarDamageData {
     header: PacketHeader,
     car_damage_data: CarDamageData,
 }

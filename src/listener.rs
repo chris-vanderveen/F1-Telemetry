@@ -1,69 +1,73 @@
-use crate::constants::PACKET_HEADER_SIZE;
-use crate::packet::Packet;
-use crate::packets::header::PacketHeader;
+/// A generic network listener for receiving data packets over UDP.
+///
+/// The `Listener` struct is generic over `T` where `T` must implement the `UdpSocketInterface`.
+/// This allows the listener to be used with any UDP socket implementation that adheres to this interface,
+/// making the listener flexible and adaptable to different socket implementations.
 use crate::udp_socket_interface::UdpSocketInterface;
-use std::fs::OpenOptions;
-use std::io::{Result, Write};
+use std::io::Result;
 
 pub struct Listener<T: UdpSocketInterface> {
+    /// The socket used for receiving data.
     pub socket: T,
 }
 
 impl<T: UdpSocketInterface> Listener<T> {
+    /// Constructs a new `Listener` with a UDP socket bound to the specified port.
+    ///
+    /// # Arguments
+    ///
+    /// * `port` - The port number to bind the UDP socket to.
+    ///
+    /// # Returns
+    ///
+    /// Returns `Ok(Listener)` if the socket is successfully bound,
+    /// otherwise returns an `Err` containing the io error.
+    ///
+    /// # Errors
+    ///
+    /// This function will return an error if the socket fails to bind to the specified port.
+    /// The error returned is an `io::Error` which can be queried to determine the specific problem.
     pub fn new(port: u16) -> Result<Self> {
         let socket = T::bind(format!("10.0.0.120:{}", port))?;
         Ok(Listener { socket })
     }
 
-    pub fn listen(&mut self) -> Result<()> {
+    /// Starts listening for packets on the bound socket. Received packets are passed to the provided callback function.
+    ///
+    /// This method will continuously receive data from the socket and will pass the data slices to
+    /// the provided `process_packet` function. The loop continues indefinitely unless a receiving error occurs.
+    ///
+    /// # Arguments
+    ///
+    /// * `process_packet` - A mutable callback function that takes a slice of bytes (the packet data).
+    ///   The function should handle processing of the packet data. The function does not return a value.
+    ///
+    /// # Returns
+    ///
+    /// Returns `Ok(())` if the listening loop ends normally (which in this setup, only ends on error),
+    /// otherwise returns an `Err` containing the io error that caused the listening loop to terminate.
+    ///
+    /// # Errors
+    ///
+    /// This function will return an error if there's an issue receiving data from the socket,
+    /// such as a network error or socket closure.
+    pub fn listen<F>(&mut self, mut process_packet: F) -> Result<()>
+    where
+        F: FnMut(&[u8]) -> (),
+    {
         let mut buf = [0; 2048];
         loop {
             match self.socket.recv_from(&mut buf) {
                 Ok((num_bytes, src_addr)) => {
-                    println!("Recieved {} bytes from {}", num_bytes, src_addr);
-                    self.process_packet(&buf[..num_bytes]);
-                }
-                Err(e) => {
-                    eprintln!("Error receiving packet: {}", e);
-                }
-            }
-        }
-    }
-
-    pub fn listen_once(&mut self) -> Result<()> {
-        let mut buf = [0; 2048];
-        let mut file = OpenOptions::new()
-            .create(true)
-            .write(true)
-            .append(true)
-            .open("packet_headers.txt")?;
-
-        let mut i = 0;
-        while i < 10000 {
-            match self.socket.recv_from(&mut buf) {
-                Ok((num_bytes, src_addr)) => {
                     println!("Received {} bytes from {}", num_bytes, src_addr);
-                    let header_str = self.process_packet(&buf[..num_bytes]);
-                    writeln!(file, "{:?}", header_str)?;
-                    i += 1;
+                    process_packet(&buf[..num_bytes]);
                 }
                 Err(e) => {
                     eprintln!("Error receiving packet: {}", e);
-                    break; // Exit early on error
+                    break;
                 }
             }
         }
         Ok(())
-    }
-
-    fn process_packet(&self, packet: &[u8]) {
-        match PacketHeader::from_bytes(packet) {
-            Ok(header) => {
-                let packet_data = &packet[PACKET_HEADER_SIZE..];
-                let packet_instance = Packet::new(header, packet_data);
-                packet_instance.process();
-            }
-            Err(e) => eprintln!("Failed to parse packet header: {}", e),
-        }
     }
 }

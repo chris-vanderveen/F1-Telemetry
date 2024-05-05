@@ -1,7 +1,7 @@
 use byteorder::{ByteOrder, LittleEndian};
 use serde::Serialize;
-use std::io::{self, Error, ErrorKind};
 
+// 29 bytes
 #[derive(Debug, Serialize)]
 pub struct PacketHeader {
     // Packet format for game year (2023)
@@ -31,14 +31,8 @@ pub struct PacketHeader {
 }
 
 impl PacketHeader {
-    pub fn from_bytes(packet: &[u8]) -> io::Result<Self> {
-        if packet.len() < 29 {
-            return Err(Error::new(
-                ErrorKind::InvalidData,
-                "Not enough data data for header",
-            ));
-        }
-        Ok(PacketHeader {
+    pub fn from_bytes(packet: &[u8]) -> Self {
+        PacketHeader {
             packet_format: LittleEndian::read_u16(&packet[0..2]),
             game_year: packet[2],
             game_major_version: packet[3],
@@ -51,6 +45,6 @@ impl PacketHeader {
             overall_frame_identifier: LittleEndian::read_u32(&packet[23..27]),
             player_car_index: packet[27],
             secondary_player_car_index: packet[28],
-        })
+        }
     }
 }

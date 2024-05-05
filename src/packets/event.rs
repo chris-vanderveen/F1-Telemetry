@@ -1,29 +1,31 @@
+use serde::Serialize;
+
 use crate::packets::header::PacketHeader;
 
 // The Event details packet is different for each type of event
 // Make sure the correct type is interpreted.
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct FastestLap {
     vehicle_idx: u8, // Index of car achieving fastest lap
     lap_time: f32,   // Lap time in seconds
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct Retirement {
     vehicle_idx: u8, // Index of vehicle retiring
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct TeamMateInPits {
     vehicle_idx: u8, // Vehicle index of teammate
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct RaceWinner {
     vehicle_idx: u8, // Race winner
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct Penalty {
     penalty_type: u8,
     infringement_type: u8,
@@ -34,7 +36,7 @@ pub struct Penalty {
     places_gained: u8,     // Num places gained doing this
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct SpeedTrap {
     vehicle_idx: u8,                    // Index of vehicle triggering speed trap
     speed: f32,                         // Top speed achieved (km/h)
@@ -44,33 +46,33 @@ pub struct SpeedTrap {
     fastest_speed_in_session: f32,      // Highest speed of fastest vehicle in session
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct StartLights {
     num_lights: u8, // Number of lights showing
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct DriveThroughPenaltyServed {
     vehicle_idx: u8, // Index of vehicle serving drive through
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct StopGoPenaltyServed {
     vehicle_idx: u8, // Index of vehicle serving stop and go
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct Flashback {
     flashback_frame_id: u32,     // Frame flashed back to
     flashback_session_time: f32, // Session time flashed to
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct Buttons {
     button_status: u32, // Bit flags specifying which buttons are being pressed
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct Overtake {
     overtaking_vehicle_idx: u8,      // Index of overtaking vehicle
     being_overtaken_vehicle_idx: u8, // Index of vehicle being overtaken

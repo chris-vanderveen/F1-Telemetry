@@ -1,5 +1,7 @@
 use crate::packets::header::PacketHeader;
+use byteorder::{ByteOrder, LittleEndian};
 
+// 50 bytes * 22 =
 #[derive(Debug)]
 pub struct LapData {
     last_lap_time_ms: u32,
@@ -38,10 +40,68 @@ pub struct LapData {
     pit_stop_should_serve_pen: u8,
 }
 
+// Size: 1131 bytes
 #[derive(Debug)]
 pub struct PacketLapData {
     header: PacketHeader,
-    lap_data: LapData,
+    lap_data: Vec<LapData>,    // There is a maximum of 22
     time_trial_pb_car_idx: u8, // index of pb car in time trial (255 if invalid)
     time_trial_rival_car_idx: u8,
+}
+
+impl PacketLapData {
+    pub fn from_bytes(data: &[u8]) -> Self {
+        let packet_header = PacketHeader::from_bytes(&data[0..29]);
+        let mut lap_data = Vec::new();
+
+        let mut offset = 50;
+        for i in 0..22 {
+            let lap = LapData::from_bytes(&data[offset..offset + 50]);
+            lap_data.push(lap);
+            offset += 5;
+        }
+
+        PacketLapData {
+            header: packet_header,
+            lap_data: lap_data,
+            time_trial_pb_car_idx: data[1129],
+            time_trial_rival_car_idx: data[1130],
+        }
+    }
+}
+
+impl LapData {
+    fn from_bytes(data: &[u8]) -> Self {
+        LapData {
+            last_lap_time_ms: LittleEndian::read_u32(&data[0..4]),
+            current_lap_time_ms: LittleEndian::read_u32(&data[4..8]),
+            sector_1_time_ms: LittleEndian::read_u16(&data[8..10]),
+            sector_1_time_mins: data[10],
+            sector_2_time_ms: LittleEndian::read_u16(&data[11..13]),
+            sector_2_time_mins: data[13],
+            delta_to_car_ahead_ms: LittleEndian::read_u16(&data[14..16]),
+            delta_to_race_leader: LittleEndian::read_u16(&data[16..18]),
+            lap_distance: LittleEndian::read_f32(&data[18..22]),
+            total_distance: LittleEndian::read_f32(&data[22..26]),
+            safety_car_delta: LittleEndian::read_f32(&data[26..30]),
+            car_postion: data[30],
+            current_lap_number: data[31],
+            pit_status: data[32],
+            num_pit_stops: data[33],
+            sector: data[34],
+            current_lap_invalid: data[35],
+            penalties: data[36],
+            total_warnings: data[37],
+            corner_cutting_warnings: data[38],
+            num_unserved_drive_through_pens: data[39],
+            num_unserved_stop_go_pens: data[40],
+            grid_position: data[41],
+            driver_status: data[42],
+            result_status: data[43],
+            pit_lane_timer_active: data[44],
+            pit_lane_time_in_lane_ms: LittleEndian::read_u16(&data[45..47]),
+            pit_stop_time_ms: LittleEndian::read_u16(&data[47..49]),
+            pit_stop_should_serve_pen: data[49],
+        }
+    }
 }

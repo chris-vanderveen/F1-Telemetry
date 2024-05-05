@@ -1,74 +1,38 @@
-use crate::packets::header::PacketHeader;
-use crate::packets::motion::CarMotionData;
+use crate::packets::car_damage_data::PacketCarDamageData;
+use crate::packets::car_setups::PacketCarSetupData;
+use crate::packets::car_status::PacketCarStatusData;
+use crate::packets::car_telemetry::PacketCarTelemetryData;
+use crate::packets::event::PacketEventData;
+use crate::packets::final_classication::PacketFinalClassification;
+use crate::packets::lap_data::PacketLapData;
+use crate::packets::lobby_info::PacketLobbyInfoData;
+use crate::packets::motion::PacketMotionData;
+use crate::packets::motion_ex::PacketMotionExData;
+use crate::packets::participants::PacketParticipantsData;
 use crate::packets::session::PacketSessionData;
+use crate::packets::session_history::PacketSessionHistoryData;
+use crate::packets::tyre_sets::PacketTyreSetData;
 use serde::Serialize;
-use std::fs::OpenOptions;
-use std::io::{self, Seek, SeekFrom, Write};
-use std::path::Path;
 
-pub struct Packet<'a> {
-    header: PacketHeader,
-    data: &'a [u8],
+pub enum Packet {
+    Motion(PacketMotionData),
+    Session(PacketSessionData),
+    LapData(PacketLapData),
+    Event(PacketEventData),
+    Participants(PacketParticipantsData),
+    Setups(PacketCarSetupData),
+    Telemetry(PacketCarTelemetryData),
+    Status(PacketCarStatusData),
+    FinalClassification(PacketFinalClassification),
+    Lobby(PacketLobbyInfoData),
+    Damage(PacketCarDamageData),
+    History(PacketSessionHistoryData),
+    TyreSets(PacketTyreSetData),
+    MotionEx(PacketMotionExData),
 }
 
-impl<'a> Packet<'a> {
-    pub fn new(header: PacketHeader, data: &'a [u8]) -> Self {
-        Packet { header, data }
-    }
-
-    pub fn process(&self) {
-        match self.header.packet_id {
-            0 => self.process_motion_data(),
-            1 => self.process_session_data(),
-            // 2 => self.process_lap_data(),
-            // 3 => self.process_event_data(),
-            // 4 => self.process_participants_data(),
-            // 5 => self.process_car_setups_data(),
-            // 6 => self.process_car_telemetry_data(),
-            // 7 => self.process_car_status_data(),
-            // 8 => self.process_final_classification_data(),
-            // 9 => self.process_lobby_info_data(),
-            // 10 => self.process_car_damage_data(),
-            // 11 => self.process_session_history_data(),
-            // 12 => self.process_tyre_sets_data(),
-            // 13 => self.process_motion_ex_data(),
-            _ => println!("Unknown packet ID: {}", self.header.packet_id),
-        }
-    }
-
-    fn process_motion_data(&self) {
-        let car_motion_data = CarMotionData::from_bytes(self.data);
-        let filename = format!(
-            "/Users/chrisvanderveen/Documents/School/DEV/f1_data/motion_data/{}_motion.json",
-            self.header.session_uid
-        );
-        let path = Path::new(&filename);
-        if let Err(e) = Packet::<'a>::save_to_file(&car_motion_data, &path) {
-            eprintln!("Failed to save or update motion data: {}", e);
-        }
-    }
-
-    fn process_session_data(&self) {
-        let session_data = PacketSessionData::from_bytes(self.data);
-    }
-
-    fn save_to_file<T: Serialize>(data: &T, path: &Path) -> io::Result<()> {
-        let file_exists = path.exists();
-        let mut file = OpenOptions::new()
-            .write(true)
-            .create(!file_exists)
-            .append(file_exists)
-            .open(path)?;
-
-        if file_exists {
-            file.seek(SeekFrom::End(-1))?;
-            writeln!(file, ",{}", serde_json::to_string(data)?)?;
-        } else {
-            writeln!(file, "[{}]", serde_json::to_string(data)?)?;
-        }
-
-        Ok(())
-    }
+pub trait SerializeToJSON {
+    fn serialize_to_json(&self) -> std::io::Result<()>;
 }
 
 // Just some extra (necessary) stuff that I don't know what else to do with
