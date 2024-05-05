@@ -1,10 +1,12 @@
+use serde::Serialize;
+
 use crate::packets::header::PacketHeader;
 use crate::packets::participants::Nationality;
 use crate::packets::participants::Team;
 
 // Two every second while in lobby
 // 1218 bytes
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct LobbyInfoData {
     ai_controlled: u8, // 1 = ai, 2 = human
     team_id: Team,
@@ -15,7 +17,7 @@ pub struct LobbyInfoData {
     ready_status: u8,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct PacketLobbyInfoData {
     header: PacketHeader,
     num_players: u8,

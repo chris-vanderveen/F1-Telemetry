@@ -1,8 +1,10 @@
+use serde::Serialize;
+
 use crate::packet::TyreCompound;
 use crate::packets::header::PacketHeader;
 
 // Once at the end of race
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct FinalClassificationData {
     position: u8,      // Finishing pos
     num_laps: u8,      // NUmber of laps completed
@@ -20,7 +22,7 @@ pub struct FinalClassificationData {
     tyre_stints_end_lap: Vec<TyreCompound>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct PacketFinalClassification {
     header: PacketHeader,
     num_cars: u8,

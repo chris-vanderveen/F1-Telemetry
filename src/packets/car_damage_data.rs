@@ -1,8 +1,10 @@
+use serde::Serialize;
+
 use crate::packets::header::PacketHeader;
 
 // Frequency: 10/s
 // Size: 953 bytes
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct CarDamageData {
     tyres_wear: Vec<f32>, // Vec of four floats that represent tyre wear (Percentage)
     tyres_damage: Vec<u8>,
@@ -27,7 +29,7 @@ pub struct CarDamageData {
     engine_seized: u8, // 0 = OK, 1 = fault
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct PacketCarDamageData {
     header: PacketHeader,
     car_damage_data: CarDamageData,

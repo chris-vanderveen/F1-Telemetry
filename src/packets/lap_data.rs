@@ -1,8 +1,9 @@
 use crate::packets::header::PacketHeader;
 use byteorder::{ByteOrder, LittleEndian};
+use serde::Serialize;
 
 // 50 bytes * 22 =
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct LapData {
     last_lap_time_ms: u32,
     current_lap_time_ms: u32,
@@ -41,7 +42,7 @@ pub struct LapData {
 }
 
 // Size: 1131 bytes
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct PacketLapData {
     header: PacketHeader,
     lap_data: Vec<LapData>,    // There is a maximum of 22

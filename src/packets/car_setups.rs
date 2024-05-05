@@ -1,9 +1,11 @@
+use serde::Serialize;
+
 use crate::packets::header::PacketHeader;
 
 // Frequency: 2/s
 
 // Size: 1107 bytes
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct CarSetupData {
     front_wing: u8,    // Front wing aero
     rear_wing: u8,     // Rear wing aero
@@ -29,7 +31,7 @@ pub struct CarSetupData {
     fuel_load: f32,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct PacketCarSetupData {
     header: PacketHeader,
     car_setups: CarSetupData,

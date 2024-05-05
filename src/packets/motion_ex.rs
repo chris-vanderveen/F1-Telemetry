@@ -1,8 +1,10 @@
+use serde::Serialize;
+
 use crate::packets::header::PacketHeader;
 
 // Frequency: Rate as specified in menu
 // Size: 217 bytes
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct PacketMotionExData {
     header: PacketHeader,
     suspension_velocity: Vec<f32>, // <RL, RR, FL, FR> [4]

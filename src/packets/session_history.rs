@@ -1,8 +1,10 @@
+use serde::Serialize;
+
 use crate::packets::header::PacketHeader;
 
 // Frequency: 20/s (cycles through all 20 cars once per second)
 // Size: 1460 bytes
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct LapHistoryData {
     lap_time_ms: u32,
     sector_1_time_ms: u16,
@@ -14,14 +16,14 @@ pub struct LapHistoryData {
     lap_valid_bit_flags: u8, // 0x01 = lap valid, 0x02 = sector 1 valid, 0x04 = sector 2 valid, 0x08 = sector 3 valid
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct TyreStintHistoryData {
     end_lap: u8, // Lap the tyre usage ends on
     tyre_actual_compound: u8,
     tyre_visual_compound: u8,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct PacketSessionHistoryData {
     header: PacketHeader,
     car_idx: u8,           // Index of the car that this data relates to

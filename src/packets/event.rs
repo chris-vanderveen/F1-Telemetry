@@ -78,7 +78,7 @@ pub struct Overtake {
     being_overtaken_vehicle_idx: u8, // Index of vehicle being overtaken
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub enum Event {
     SessionStarted,
     SessionEnded,
@@ -98,7 +98,7 @@ pub enum Event {
     Overtake(Overtake),
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct PacketEventData {
     packet_header: PacketHeader,
     event_string_code: Vec<u8>,

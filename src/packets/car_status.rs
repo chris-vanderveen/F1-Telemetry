@@ -1,8 +1,10 @@
+use serde::Serialize;
+
 use crate::packet::TyreCompound;
 use crate::packets::header::PacketHeader;
 // Frequency: Rate as specified in menu
 // Size: 1239 bytes
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct CarStatusData {
     traction_control: u8,   // 0 = off, 1 = medium, 2 = full
     anti_lock_brakes: u8,   // 0 = off, 1 = on
@@ -31,7 +33,7 @@ pub struct CarStatusData {
     network_paused: u8, // Whether the car is paused in a network game
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct PacketCarStatusData {
     header: PacketHeader,
     car_status_data: CarStatusData,

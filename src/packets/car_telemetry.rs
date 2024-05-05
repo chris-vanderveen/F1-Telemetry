@@ -1,10 +1,12 @@
+use serde::Serialize;
+
 use crate::packet::SurfaceType;
 use crate::packet::WheelData;
 use crate::packets::header::PacketHeader;
 
 // Frequency: 2/s
 // Size: 1107 bytes
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct CarTelemetryData {
     speed: u16,    // Speed of car in km/h
     throttle: f32, // Amount of throttle applied (0.0 -> 1.0)
@@ -24,7 +26,7 @@ pub struct CarTelemetryData {
     surface_type: WheelData<SurfaceType>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct PacketCarTelemetryData {
     header: PacketHeader,
     car_telemetry_data: CarTelemetryData,

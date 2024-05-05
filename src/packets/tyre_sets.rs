@@ -1,9 +1,11 @@
+use serde::Serialize;
+
 use crate::packet::TyreCompound;
 use crate::packets::header::PacketHeader;
 
 // Frequency: 20/s cycles through cars
 // Size: 231 bytes
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct TyreSetData {
     actual_tyre_compound: TyreCompound,
     visual_tyre_compound: TyreCompound,
@@ -16,7 +18,7 @@ pub struct TyreSetData {
     fitted: u8,          // Whether the set is fitted or not
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct PacketTyreSetData {
     header: PacketHeader,
     car_idx: u8,
