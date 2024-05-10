@@ -1,7 +1,8 @@
 use crate::packets::header::PacketHeader;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Serialize)]
+// Size = 58 bytes * 22 = 1276 bytes
+#[derive(Debug, Serialize, Deserialize)]
 pub struct ParticipantData {
     ai_controlled: u8,     // AI = 1, Human = 0
     driver_id: u8,         // Driver Id - 255 if Human
@@ -10,18 +11,63 @@ pub struct ParticipantData {
     my_team: u8,           // My Team Flag - 1 = My team, 0 = False
     race_number: u8,       // Race number of the car
     nationality: u8,       // Nationality of driver
-    name: char,            // Name of participant UTF-8 null-terminated
+    name: String,          // Name of participant UTF-8 null-terminated
     your_telemetry: u8,    // Players UDP setting, 0 = restricted, 1 = public
     show_online_names: u8, // 0 = off, 1 = on
     platform: u8,          // 1 = Steam, 3 = PS, 4 = Xbox, 6 = Origin, 255 = Unknown
 }
 
 // Every 5 Seconds 1306 bytes
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct PacketParticipantsData {
-    header: PacketHeader,
+    pub header: PacketHeader,
     num_active_cars: u8, // Number of cars in the data
-    participants: ParticipantData,
+    participants: Vec<ParticipantData>,
+}
+
+impl PacketParticipantsData {
+    pub fn from_bytes(data: &[u8]) -> Self {
+        let header = PacketHeader::from_bytes(&data[0..29]);
+        let mut participants = Vec::new();
+        let mut offset = 30;
+        let num_participants = data[29];
+
+        for _i in 0..num_participants {
+            let participant = ParticipantData::from_bytes(&data[offset..offset + 58]);
+            participants.push(participant);
+            offset += 58;
+        }
+
+        PacketParticipantsData {
+            header: header,
+            num_active_cars: data[29],
+            participants: participants,
+        }
+    }
+}
+
+impl ParticipantData {
+    fn from_bytes(data: &[u8]) -> Self {
+        let name_bytes = &data[7..55];
+        let name = std::str::from_utf8(name_bytes)
+            .unwrap_or_default()
+            .trim_end_matches(char::from(0))
+            .to_string();
+
+        ParticipantData {
+            ai_controlled: data[0],
+            driver_id: data[1],
+            network_id: data[2],
+            team_id: data[3],
+            my_team: data[4],
+            race_number: data[5],
+            nationality: data[6],
+            name,
+            your_telemetry: data[55],
+            show_online_names: data[56],
+            platform: data[57],
+        }
+    }
 }
 
 #[derive(Debug, Default, Serialize)]

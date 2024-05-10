@@ -1,13 +1,13 @@
 use crate::packets::header::PacketHeader;
 use byteorder::{ByteOrder, LittleEndian};
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 // Details about the current session in progress
 // Frequency 2 per second
 // Size: 644 bytes
 
 // 5 bytes * 21 = 105 bytes
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct MarshalZone {
     // Fraction (0..1) of the way through the lap marshal zone starts
     zone_start: f32,
@@ -16,7 +16,7 @@ pub struct MarshalZone {
 }
 
 // 8 bytes * 56 = 448 bytes
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct WeatherForecastSample {
     // 0 = unknown, 1 = P1, 2 = P2, 3 = P3, 4 = Short P, 5 = Q1
     // 6 = Q2, 7 = Q3, 8 = Short Q, 9 = OSQ, 10 = R, 11 = R2
@@ -38,9 +38,9 @@ pub struct WeatherForecastSample {
     rain_percentage: u8,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct PacketSessionData {
-    header: PacketHeader,
+    pub header: PacketHeader,
     weather: u8,
     track_temperature: i8,
     air_temperature: i8,
@@ -117,7 +117,7 @@ impl PacketSessionData {
         let num_marshal_zones = data[47] as usize;
         let mut marshal_zones = Vec::new();
         let mut offset = 48;
-        for i in 0..num_marshal_zones {
+        for _i in 0..num_marshal_zones {
             let zone = MarshalZone::from_bytes(&data[offset..offset + 5]);
             match zone {
                 Ok(zone) => {
@@ -135,7 +135,7 @@ impl PacketSessionData {
         let num_weather_forecast_samples = data[155] as usize;
         let mut weather_forecast_samples = Vec::new();
         let mut offset = 156;
-        for i in 0..num_weather_forecast_samples {
+        for _i in 0..num_weather_forecast_samples {
             let sample = WeatherForecastSample::from_bytes(&data[offset..offset + 8]);
             match sample {
                 Ok(sample) => {
@@ -211,12 +211,6 @@ impl MarshalZone {
                 "Invalid data",
             ));
         }
-        let bytes: [u8; 4] = data[0..4].try_into().map_err(|_| {
-            std::io::Error::new(
-                std::io::ErrorKind::InvalidInput,
-                "Failed to convert slice to array",
-            )
-        })?;
 
         let zone_start = LittleEndian::read_f32(&data[0..4]);
         let zone_flag = data[4] as i8;

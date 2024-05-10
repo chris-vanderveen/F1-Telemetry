@@ -1,10 +1,10 @@
-use serde::Serialize;
-
 use crate::packets::header::PacketHeader;
+use byteorder::{ByteOrder, LittleEndian};
+use serde::{Deserialize, Serialize};
 
 // Frequency: 10/s
-// Size: 953 bytes
-#[derive(Debug, Serialize)]
+// Size: 42 bytes
+#[derive(Debug, Serialize, Deserialize)]
 pub struct CarDamageData {
     tyres_wear: Vec<f32>, // Vec of four floats that represent tyre wear (Percentage)
     tyres_damage: Vec<u8>,
@@ -29,8 +29,66 @@ pub struct CarDamageData {
     engine_seized: u8, // 0 = OK, 1 = fault
 }
 
-#[derive(Debug, Serialize)]
+// Size: 953 byte
+#[derive(Debug, Serialize, Deserialize)]
 pub struct PacketCarDamageData {
-    header: PacketHeader,
-    car_damage_data: CarDamageData,
+    pub header: PacketHeader,
+    car_damage_data: Vec<CarDamageData>,
+}
+
+impl PacketCarDamageData {
+    pub fn from_bytes(data: &[u8]) -> Self {
+        let header = PacketHeader::from_bytes(&data[0..29]);
+        let mut car_damage_data = Vec::new();
+        let mut offset = 29;
+
+        for _i in 0..21 {
+            let data = CarDamageData::from_bytes(&data[offset..offset + 42]);
+            car_damage_data.push(data);
+            offset += 42;
+        }
+
+        PacketCarDamageData {
+            header: header,
+            car_damage_data: car_damage_data,
+        }
+    }
+}
+
+impl CarDamageData {
+    fn from_bytes(data: &[u8]) -> Self {
+        let mut tyres_wear = Vec::new();
+        let mut tyres_damage = Vec::new();
+        let mut brakes_damage = Vec::new();
+
+        for i in 0..3 {
+            tyres_wear.push(LittleEndian::read_f32(&data[i..i + 4]));
+            tyres_damage.push(data[i + 16]);
+            brakes_damage.push(data[i + 20]);
+        }
+
+        CarDamageData {
+            tyres_wear: tyres_wear,
+            tyres_damage: tyres_damage,
+            brakes_damage: brakes_damage,
+            fl_wing_damage: data[24],
+            fr_wing_damage: data[25],
+            rear_wing_damage: data[26],
+            floor_damage: data[27],
+            diffuser_damage: data[28],
+            sidepod_damage: data[29],
+            drs_fault: data[30],
+            ers_fault: data[31],
+            gear_box_damage: data[32],
+            engine_damage: data[33],
+            engine_mguh_wear: data[34],
+            engine_es_wear: data[35],
+            engine_ce_wear: data[36],
+            engine_ice_wear: data[37],
+            engine_mguk_wear: data[38],
+            engine_tc_wear: data[39],
+            engine_blown: data[40],
+            engine_seized: data[41],
+        }
+    }
 }

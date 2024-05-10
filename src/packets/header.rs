@@ -1,8 +1,8 @@
 use byteorder::{ByteOrder, LittleEndian};
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 // 29 bytes
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct PacketHeader {
     // Packet format for game year (2023)
     pub packet_format: u16,

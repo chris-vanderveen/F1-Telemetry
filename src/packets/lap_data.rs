@@ -1,9 +1,9 @@
 use crate::packets::header::PacketHeader;
 use byteorder::{ByteOrder, LittleEndian};
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 // 50 bytes * 22 =
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct LapData {
     last_lap_time_ms: u32,
     current_lap_time_ms: u32,
@@ -42,9 +42,9 @@ pub struct LapData {
 }
 
 // Size: 1131 bytes
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct PacketLapData {
-    header: PacketHeader,
+    pub header: PacketHeader,
     lap_data: Vec<LapData>,    // There is a maximum of 22
     time_trial_pb_car_idx: u8, // index of pb car in time trial (255 if invalid)
     time_trial_rival_car_idx: u8,
@@ -55,11 +55,11 @@ impl PacketLapData {
         let packet_header = PacketHeader::from_bytes(&data[0..29]);
         let mut lap_data = Vec::new();
 
-        let mut offset = 50;
-        for i in 0..22 {
+        let mut offset = 29;
+        for _i in 0..22 {
             let lap = LapData::from_bytes(&data[offset..offset + 50]);
             lap_data.push(lap);
-            offset += 5;
+            offset += 50;
         }
 
         PacketLapData {
