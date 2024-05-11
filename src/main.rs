@@ -22,6 +22,7 @@ fn main() -> Result<(), std::io::Error> {
     let config_str = fs::read_to_string("./src/config.json").expect("Failed to read config file");
     let config: Config =
         { serde_json::from_str(&config_str).expect("Failed to parse config file") };
+
     let listener_result = Listener::<UdpSocket>::new(config.port);
 
     match listener_result {
