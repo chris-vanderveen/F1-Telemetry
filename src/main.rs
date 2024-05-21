@@ -23,10 +23,12 @@ fn main() -> Result<(), std::io::Error> {
     let full_bind_address = format!("{}:{}", bind_address, port);
 
     let listener_result = Listener::<UdpSocket>::new(&full_bind_address);
+    let mut packet_count = 0;
 
     match listener_result {
         Ok(mut listener) => {
             listener.listen(|packet_data| {
+                packet_count += 1; // This is temporary to estimate throughput
                 let packet_id = packet_data[6];
                 match packet_id {
                     0 => {
@@ -128,12 +130,12 @@ fn main() -> Result<(), std::io::Error> {
                         eprintln!("Unknown packet id: {}", packet_id);
                     }
                 };
+                println!("Packet count {}: ", packet_count); // Temporary until I implement a better method of tracking this
             })?;
         }
         Err(e) => {
             eprintln!("Failed to create listener: {}", e);
         }
     }
-
     Ok(())
 }
