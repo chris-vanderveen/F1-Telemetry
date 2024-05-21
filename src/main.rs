@@ -9,6 +9,7 @@ use project::{
         lap_data::PacketLapData, lobby_info::PacketLobbyInfoData, motion::PacketMotionData,
         motion_ex::PacketMotionExData, participants::PacketParticipantsData,
         session::PacketSessionData, session_history::PacketSessionHistoryData,
+        tyre_sets::PacketTyreSetData,
     },
 };
 use std::{env, net::UdpSocket};
@@ -120,6 +121,13 @@ fn main() -> Result<(), std::io::Error> {
                         }
                     }
                     12 => {
+                        let tyre_sets_packet =
+                            Packet::TyreSets(PacketTyreSetData::from_bytes(&packet_data));
+                        if let Err(e) = tyre_sets_packet.serialize_to_json() {
+                            eprintln!("Error serializing tyre set packet to json: {}", e);
+                        }
+                    }
+                    13 => {
                         let motion_ex_packet =
                             Packet::MotionEx(PacketMotionExData::from_bytes(&packet_data));
                         if let Err(e) = motion_ex_packet.serialize_to_json() {
