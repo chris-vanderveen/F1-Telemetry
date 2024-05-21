@@ -108,8 +108,11 @@ pub trait SerializeToJSON {
     fn serialize_to_json(&self) -> std::io::Result<()>;
 }
 
-// Just some extra (necessary) stuff that I don't know what else to do with
+pub trait PacketProcessor {
+    fn process_packet(packet_data: &[u8]);
+}
 
+// Just some extra (necessary) stuff that I don't know what else to do with
 #[derive(Debug, Default, Serialize)]
 pub enum TyreCompound {
     C0,

@@ -17,6 +17,5 @@ impl UdpSocketInterface for UdpSocket {
     fn recv_from(&self, buf: &mut [u8]) -> Result<(usize, String)> {
         self.recv_from(buf)
             .map(|(size, addr)| (size, addr.to_string()))
-            .map_err(|e| e.into())
     }
 }

@@ -1,4 +1,4 @@
-use crate::packets::header::PacketHeader;
+use crate::{packet::PacketProcessor, packets::header::PacketHeader};
 use byteorder::{ByteOrder, LittleEndian};
 use serde::{Deserialize, Serialize};
 
@@ -93,5 +93,11 @@ impl PacketMotionData {
             header: header,
             car_motion_data: car_motion_data,
         }
+    }
+}
+
+impl PacketProcessor for PacketMotionData {
+    fn process_packet(packet_data: &[u8]) {
+        let packet = Self::from_bytes(packet_data);
     }
 }

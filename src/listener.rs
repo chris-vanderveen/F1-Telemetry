@@ -4,6 +4,7 @@
 /// This allows the listener to be used with any UDP socket implementation that adheres to this interface,
 /// making the listener flexible and adaptable to different socket implementations.
 use crate::udp_socket_interface::UdpSocketInterface;
+use log::{error, info};
 use std::io::Result;
 
 pub struct Listener<T: UdpSocketInterface> {
@@ -27,8 +28,8 @@ impl<T: UdpSocketInterface> Listener<T> {
     ///
     /// This function will return an error if the socket fails to bind to the specified port.
     /// The error returned is an `io::Error` which can be queried to determine the specific problem.
-    pub fn new(port: u16) -> Result<Self> {
-        let socket = T::bind(format!("10.0.0.120:{}", port))?;
+    pub fn new(address: &str) -> Result<Self> {
+        let socket = T::bind(address.to_string())?;
         Ok(Listener { socket })
     }
 
@@ -59,15 +60,14 @@ impl<T: UdpSocketInterface> Listener<T> {
         loop {
             match self.socket.recv_from(&mut buf) {
                 Ok((num_bytes, src_addr)) => {
-                    println!("Received {} bytes from {}", num_bytes, src_addr);
+                    info!("Received {} bytes from {}", num_bytes, src_addr);
                     process_packet(&buf[..num_bytes]);
                 }
                 Err(e) => {
-                    eprintln!("Error receiving packet: {}", e);
-                    break;
+                    error!("Error receiving packet: {}", e);
+                    return Err(e);
                 }
             }
         }
-        Ok(())
     }
 }

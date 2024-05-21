@@ -1,3 +1,4 @@
+use dotenv::dotenv;
 use project::{
     listener::Listener,
     packet::{Packet, SerializeToJSON},
@@ -10,20 +11,18 @@ use project::{
         session::PacketSessionData, session_history::PacketSessionHistoryData,
     },
 };
-use serde::Deserialize;
-use std::{fs, net::UdpSocket};
-
-#[derive(Deserialize)]
-struct Config {
-    port: u16,
-}
+use std::{env, net::UdpSocket};
 
 fn main() -> Result<(), std::io::Error> {
-    let config_str = fs::read_to_string("./src/config.json").expect("Failed to read config file");
-    let config: Config =
-        { serde_json::from_str(&config_str).expect("Failed to parse config file") };
+    dotenv().ok();
+    env_logger::init();
 
-    let listener_result = Listener::<UdpSocket>::new(config.port);
+    let bind_address = env::var("UDP_ADDRESS").unwrap_or_else(|_| "127.0.0.1".to_string());
+    let port_str = env::var("PORT").unwrap_or_else(|_| "8000".to_string());
+    let port: u16 = port_str.parse().expect("PORT must be a number");
+    let full_bind_address = format!("{}:{}", bind_address, port);
+
+    let listener_result = Listener::<UdpSocket>::new(&full_bind_address);
 
     match listener_result {
         Ok(mut listener) => {
