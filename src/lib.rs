@@ -2,11 +2,6 @@ pub mod listener;
 pub mod packet;
 pub mod udp_socket_interface;
 
-pub mod constants {
-    pub const PACKET_HEADER_SIZE: usize = 29;
-    pub const FILE_PATH: &str = "/Users/chrisvanderveen/Documents/School/DEV/f1_data/";
-}
-
 pub mod packets {
     pub mod car_damage_data;
     pub mod car_setups;
@@ -23,4 +18,8 @@ pub mod packets {
     pub mod session;
     pub mod session_history;
     pub mod tyre_sets;
+}
+
+pub mod data_processing {
+    pub mod packet_throughput;
 }

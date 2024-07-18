@@ -54,14 +54,16 @@ impl<T: UdpSocketInterface> Listener<T> {
     /// such as a network error or socket closure.
     pub fn listen<F>(&mut self, mut process_packet: F) -> Result<()>
     where
-        F: FnMut(&[u8]) -> (),
+        F: FnMut(&[u8]) -> bool,
     {
         let mut buf = [0; 2048];
         loop {
             match self.socket.recv_from(&mut buf) {
                 Ok((num_bytes, src_addr)) => {
                     info!("Received {} bytes from {}", num_bytes, src_addr);
-                    process_packet(&buf[..num_bytes]);
+                    if !process_packet(&buf[..num_bytes]) {
+                        ()
+                    }
                 }
                 Err(e) => {
                     error!("Error receiving packet: {}", e);

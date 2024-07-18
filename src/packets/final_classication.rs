@@ -56,7 +56,7 @@ impl FinalClassificationData {
         let mut tyre_stints_actual = Vec::new();
         let mut tyre_stints_visual = Vec::new();
         let mut tyre_stints_end_lap = Vec::new();
-        let offset = 21;
+        let offset = 17;
 
         for i in 0..7 {
             tyre_stints_actual.push(data[offset + i]);
@@ -72,10 +72,10 @@ impl FinalClassificationData {
             num_pit_stops: data[4],
             results_status: data[5],
             best_lap_time: LittleEndian::read_u32(&data[6..10]),
-            total_race_time: LittleEndian::read_u32(&data[10..18]),
-            penalties_time: data[18],
-            num_penalties: data[19],
-            num_tyre_stints: data[20],
+            total_race_time: LittleEndian::read_u32(&data[10..14]),
+            penalties_time: data[14],
+            num_penalties: data[15],
+            num_tyre_stints: data[16],
             tyre_stints_actual: tyre_stints_actual,
             tyre_stints_visual: tyre_stints_visual,
             tyre_stints_end_lap: tyre_stints_end_lap,
