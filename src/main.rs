@@ -29,13 +29,23 @@ fn main() -> Result<(), std::io::Error> {
 
     match listener_result {
         Ok(mut listener) => {
+            let mut throughput = PacketThroughput::new();
+
             listener.listen(|packet_data| {
                 let packet_id = packet_data[6];
                 let session_id = LittleEndian::read_u64(&packet_data[7..15]);
-                let mut throughput = PacketThroughput::new(session_id);
+
+                // Update session ID if there is a change
+                if throughput.session_id() != session_id && session_id != 0 {
+                    throughput.set_session_id(session_id);
+                }
 
                 // If in a current session
                 if session_id != 0 {
+                    if let Err(e) = throughput.update(&packet_id) {
+                        eprintln!("Error updating throughput: {}", e);
+                    }
+
                     match packet_id {
                         0 => {
                             let motion_packet =
@@ -106,7 +116,9 @@ fn main() -> Result<(), std::io::Error> {
                             }
                             // When a final classification is encountered calculate throughput
                             // and return false to end the listener loop
-                            let _ = throughput.calculate_throughput();
+                            if let Err(e) = throughput.calculate_throughput() {
+                                eprintln!("Error calculating throughput: {}", e);
+                            }
                             return false;
                         }
                         9 => {
@@ -151,7 +163,6 @@ fn main() -> Result<(), std::io::Error> {
                             eprintln!("Unknown packet id: {}", packet_id);
                         }
                     }; // End of match statement
-                    let _ = throughput.update(&packet_id);
                 }
                 true
             })?;

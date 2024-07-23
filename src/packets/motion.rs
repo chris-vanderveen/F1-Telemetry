@@ -98,6 +98,6 @@ impl PacketMotionData {
 
 impl PacketProcessor for PacketMotionData {
     fn process_packet(packet_data: &[u8]) {
-        let packet = Self::from_bytes(packet_data);
+        let _packet = Self::from_bytes(packet_data);
     }
 }
