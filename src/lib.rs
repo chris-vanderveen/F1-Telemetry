@@ -23,3 +23,8 @@ pub mod packets {
 pub mod data_processing {
     pub mod packet_throughput;
 }
+
+pub mod db {
+    pub mod client;
+    pub mod tables;
+}
