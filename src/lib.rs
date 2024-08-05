@@ -25,6 +25,6 @@ pub mod data_processing {
 }
 
 pub mod db {
-    pub mod client;
-    pub mod tables;
+    pub mod models;
+    pub mod operations;
 }
