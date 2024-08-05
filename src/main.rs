@@ -2,6 +2,10 @@ use byteorder::{ByteOrder, LittleEndian};
 use dotenv::dotenv;
 use project::{
     data_processing::packet_throughput::PacketThroughput,
+    db::{
+        client::{self, create_local_client},
+        tables,
+    },
     listener::Listener,
     packet::{Packet, SerializeToJSON},
     packets::{
@@ -16,9 +20,13 @@ use project::{
 };
 use std::{env, net::UdpSocket};
 
-fn main() -> Result<(), std::io::Error> {
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
     dotenv().ok();
     env_logger::init();
+
+    // DB initialization
+    let client = create_local_client().await;
 
     let bind_address = env::var("UDP_ADDRESS").unwrap_or_else(|_| "127.0.0.1".to_string());
     let port_str = env::var("PORT").unwrap_or_else(|_| "8000".to_string());
