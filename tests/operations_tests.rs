@@ -1,6 +1,8 @@
 #[cfg(test)]
 mod tests {
+    use chrono::{DateTime, Utc};
     use dotenv::dotenv;
+    use project::db::models::Session;
     use project::db::operations::get_user;
     use tokio_postgres::{Client, NoTls};
 
@@ -102,5 +104,42 @@ mod tests {
             .execute(reset_serial_query, &[])
             .await
             .expect("Failed to reset serial counter");
+    }
+
+    #[tokio::test]
+    pub async fn test_add_session() {}
+
+    // Helper function to create a dummy Session struct
+    pub fn create_dummy_session() -> Session {
+        Session {
+            user_id: 1,
+            session_name: String::from("Test Race"),
+            session_start: Utc::now().timestamp(),
+            session_end: Utc::now().timestamp() + 3600, // 1 hour later
+            session_type: String::from("Race"),
+            session_status: 1, // 1 means "completed"
+            forecast_accuracy: 80,
+            track_id: 5,
+            total_laps: 50,
+            track_length: 5000, // 5000 meters
+            pit_speed_limit: 60,
+            session_duration: 3600, // 1 hour in seconds
+            num_marshal_zones: 20,
+            network_game: 0, // 0 means "no"
+            ai_difficulty: 90,
+            steering_assist: 0, // 0 means "off"
+            braking_assist: 0,
+            gearbox_assist: 0,
+            pit_assist: 0,
+            pit_release_assist: 0,
+            ers_assist: 0,
+            drs_assist: 0,
+            game_mode: 3,         // Arbitrary value
+            rule_set: 1,          // Arbitrary value
+            time_of_day: 14,      // represents 2 PM
+            session_length: 100,  // Arbitrary value
+            speed_units: 0,       // 0 means "km/h"
+            temperature_units: 0, // 0 means "Celsius"
+        }
     }
 }
