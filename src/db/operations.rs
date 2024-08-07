@@ -11,3 +11,9 @@ pub async fn get_user(client: &Client, user_id: i32) -> Result<Option<User>, Err
         username: row.get(1),
     }))
 }
+
+pub async fn add_user(client: &Client, user: &User) -> Result<(), Error> {
+    let query = "INSERT INTO users (id, username) VALUES ($1, $2)";
+    client.execute(query, &[&user.id, &user.username]).await?;
+    Ok(())
+}
